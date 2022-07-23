@@ -1,9 +1,11 @@
 <?php
-$targetWidth = 1080;
-$targetHeight = 1350;
+header('Content-type: image/jpeg');
+addBorderpng('source/R1-00.jpg', 500);
 
 function addBorderpng($add, $bdr, $color = '#ababab')
 {
+    $rotate = true;
+
     $arr = explode('.', $add);
     $extension = strtolower(end($arr));
     $border = $bdr;
@@ -14,28 +16,61 @@ function addBorderpng($add, $bdr, $color = '#ababab')
         $im = imagecreatefrompng($add);
     }
 
+    if ($rotate) {
+        $im = imagerotate($im, -90, 0);
+    }
+
+    // 1228 × 1818
     $width = imagesx($im);
     $height = imagesy($im);
 
-    $img_adj_width = $width + (2 * $border);
-    $img_adj_height = $height + (2 * $border);
+    $minimalBorderX = 100;
+    $minimalBorderY = 100;
 
-    $newimage = imagecreatetruecolor($img_adj_width, $img_adj_height);
+    $desiredWidth = 1080;
+    $desiredHeight = 1350;
 
+    $resizedImageDimensions = getResizedImageDimensions($width, $height, $desiredWidth - ($minimalBorderX * 2), $desiredHeight - ($minimalBorderY * 2));
+
+    $newimage = imagecreatetruecolor($desiredWidth, $desiredHeight);
     $color_gb_temp = HexToRGB($color);
     $border_color = imagecolorallocate($newimage, $color_gb_temp['r'], $color_gb_temp['g'], $color_gb_temp['b']);
-    imagefilledrectangle($newimage, 0, 0, $img_adj_width, $img_adj_height, $border_color);
+    imagefilledrectangle($newimage, 0, 0, $desiredWidth, $desiredHeight, $border_color);
 
-    imagecopyresized($newimage, $im, $border, $border, 0, 0, $width, $height, $width, $height);
+    $resizedImage = imagescale($im, $resizedImageDimensions["w"], $resizedImageDimensions["h"]);
+    imagecopyresized($newimage, $resizedImage, $minimalBorderX, $minimalBorderY, 0, 0, $resizedImageDimensions["w"], $resizedImageDimensions["h"], $desiredWidth, $desiredHeight);
     if ($extension == 'jpg') {
         //chmod("$add", 0666);
         //imagejpeg($newimage, "out/" . $add, 9);
+        
         imagejpeg($newimage);
     } else if ($extension == 'png')
         imagepng($newimage, $add, 9);
     //imagepng($newimage);
 
 }
+
+function getResizedImageDimensions($srcWidth, $srcHeight, $maxWidth, $maxHeight)
+{
+    $resizeWidth = $srcWidth;
+    $resizeHeight = $srcHeight;
+
+    $aspect = $resizeWidth / $resizeHeight;
+
+    if ($resizeWidth > $maxWidth) {
+        $resizeWidth = $maxWidth;
+        $resizeHeight = $resizeWidth / $aspect;
+    }
+    if ($resizeHeight > $maxHeight) {
+        $aspect = $resizeWidth / $resizeHeight;
+        $resizeHeight = $maxHeight;
+        $resizeWidth = $resizeHeight * $aspect;
+    }
+
+
+    return ["w" => $resizeWidth, "h" => $resizeHeight];
+}
+
 function HexToRGB($hex)
 {
     $hex = str_replace("#", "", $hex);
@@ -52,5 +87,3 @@ function HexToRGB($hex)
     }
     return $color;
 }
-header('Content-type: image/jpeg');
-addBorderpng('source/R1-00.jpg', 500);
