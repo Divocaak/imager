@@ -19,16 +19,23 @@ foreach ($files as $file) {
     }
 }
 
+if(file_exists("download.zip")){
+    unlink("download.zip");
+}
+
 function addBorder($add)
 {
-    $extension = strtolower(end(explode('.', $add)));
+    $extensionTemp = explode('.', $add);
+    $extension = strtolower(end($extensionTemp));
     if ($extension == 'jpg') {
         $im = imagecreatefromjpeg($add);
     } else if ($extension == 'png') {
         $im = imagecreatefrompng($add);
     }
 
-    $im = imagerotate($im, -90, 0);
+    if(isset($_POST["rotate"])){
+        $im = imagerotate($im, -90, 0);
+    }
 
     $minimalBorderX = 100;
     $minimalBorderY = 100;
@@ -48,7 +55,7 @@ function addBorder($add)
     $resizedImage = imagescale($im, $resizedImageDimensions["w"], $resizedImageDimensions["h"]);
     imagecopy($newImage, $resizedImage, $offsetX, $offsetY, 0, 0, $desiredWidth, $desiredHeight);
     $newFileName = "out/" . str_replace("source/", "", $add);
-    echo "<img src='" . $newFileName . "' style='height:50%; width: auto; padding: 1px;' />";
+    echo  "<img src='" . $newFileName . "' style='height:50%; width: auto; padding: 1px;' />";
     if ($extension == 'jpg')
         imagejpeg($newImage, $newFileName, 100);
     else if ($extension == 'png')
@@ -80,11 +87,13 @@ function getResizedImageDimensions($srcWidth, $srcHeight, $maxWidth, $maxHeight)
 <head>
     <meta charset="UTF-8">
     <title>Imager response</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 
-<body>
-    <a href="index.html">return</a>
-    <a href="download.php">download all</a>
+<body class="p-5 m-5">
+    <a class="btn btn-secondary" href="index.html"><i class="bi bi-arrow-left-circle pe-2"></i>Return back</a>
+    <a class="btn btn-primary" href="download.php"><i class="bi bi-download pe-2"></i>Download</a>
 </body>
 
 </html>
