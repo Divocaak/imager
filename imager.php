@@ -103,7 +103,7 @@ function getResizedImageDimensions($srcWidth, $srcHeight, $maxWidth, $maxHeight)
     </style>
 </head>
 
-<body class="p-md-5 m-md-5 text-center pt-5">
+<body class="p-md-5 m-md-5 text-center py-5">
     <div class="fixed-top mt-2">
         <a class="btn btn-secondary" href="index.html"><i class="bi bi-arrow-left-circle pe-2"></i>Return back</a>
         <a class="btn btn-primary" href="download.php"><i class="bi bi-download pe-2"></i>Download all (.zip)</a>
