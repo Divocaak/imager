@@ -1,3 +1,14 @@
+<?php
+session_start();
+if(is_dir("out/" . $_SESSION["imagerUserKey"])){
+    array_map('unlink', glob("out/" . $_SESSION["imagerUserKey"] . "/*"));
+    rmdir("out/" . $_SESSION["imagerUserKey"]);
+}
+if (file_exists($_SESSION["imagerUserKey"] . ".zip")) {
+    unlink($_SESSION["imagerUserKey"] . ".zip");
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 

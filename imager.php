@@ -1,26 +1,18 @@
 <?php
-$files = glob('out/*');
-foreach ($files as $file) {
-    if (is_file($file)) {
-        unlink($file);
-    }
-}
+session_start();
+$_SESSION["imagerUserKey"] = time() . "-" . random_int(0, 999);
 
+mkdir("source/" . $_SESSION["imagerUserKey"]);
+mkdir("out/" . $_SESSION["imagerUserKey"]);
 for ($i = 0; $i < count($_FILES["files"]["name"]); $i++) {
-    $targetFile = "source/" . $_FILES["files"]["name"][$i];
+    $targetFile = "source/" . $_SESSION["imagerUserKey"] . "/" . $_FILES["files"]["name"][$i];
     move_uploaded_file($_FILES["files"]["tmp_name"][$i], $targetFile);
     addBorder($targetFile, $i == 0);
 }
 
-$files = glob('source/*');
-foreach ($files as $file) {
-    if (is_file($file)) {
-        unlink($file);
-    }
-}
-
-if (file_exists("download.zip")) {
-    unlink("download.zip");
+if(is_dir("source/" . $_SESSION["imagerUserKey"])){
+    array_map('unlink', glob("source/" . $_SESSION["imagerUserKey"] . "/*"));
+    rmdir("source/" . $_SESSION["imagerUserKey"]);
 }
 
 function addBorder($add, $isFirst)
@@ -57,7 +49,7 @@ function addBorder($add, $isFirst)
     imagecopy($newImage, $resizedImage, $offsetX, $offsetY, 0, 0, $desiredWidth, $desiredHeight);
 
     imagefill($newImage, 0, 0, imagecolorallocate($newImage, $inputColor[0], $inputColor[1], $inputColor[2]));
-    $newFileName = "out/" . str_replace("source/", "", $add);
+    $newFileName = str_replace("source", "out", $add);
     echo  "<img src='" . $newFileName . "'" . ($isFirst ? " class='mt-4 mt-md-0' " : "") . "/>";
     if ($extension == 'jpg')
         imagejpeg($newImage, $newFileName, 100);
@@ -105,7 +97,7 @@ function getResizedImageDimensions($srcWidth, $srcHeight, $maxWidth, $maxHeight)
 
 <body class="p-md-5 m-md-5 text-center py-5">
     <div class="fixed-top mt-2">
-        <a class="btn btn-secondary" href="index.html"><i class="bi bi-arrow-left-circle pe-2"></i>Return back</a>
+        <a class="btn btn-secondary" href="index.php"><i class="bi bi-arrow-left-circle pe-2"></i>Return back</a>
         <a class="btn btn-primary" href="download.php"><i class="bi bi-download pe-2"></i>Download all (.zip)</a>
     </div>
 </body>
